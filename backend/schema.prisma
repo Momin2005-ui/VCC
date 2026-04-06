@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  email     String        @unique 
+  password  String
+  provider  String
+  isVerified Boolean
+  refreshToken String?
+  role      Role
+
+  // relation
+  enrollments Enrollment[]
+}
+
+model Courses {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String        @unique
+  courseName  String
+  starttime        DateTime
+  endtime          DateTime
+  mode        String
+  createdBy  String
+  // relation
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId    String   
+  courseId  String   
+
+  user      User     @relation(fields: [userId], references: [id])
+  course    Courses  @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId]) // prevents duplicate enrollments
+}
+
+enum Role { 
+  USER 
+  ADMIN 
+}
