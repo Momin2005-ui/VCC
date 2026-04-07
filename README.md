@@ -9,7 +9,8 @@ ADMIN details:
   Password - test4password
 
 
-if google Oauth has to work in your local folder , you have to create google client id
+if google Oauth has to work in your local folder , you have to create google client id  but first try without creating it 
+but make sure backend runs at port 3000 and frontend in port 3001
 
 
 Admin cannot register , so only registered admins can login using Oauth 
