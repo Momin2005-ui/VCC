@@ -37,7 +37,8 @@ export default function EditCourseModal({ course, onClose, onUpdated }) {
 
     setIsLoading(true);
     try {
-      await http.put(`/user/updateCourse/${course.id}`, {
+      await http.put(`/user/updateCourse`, {
+        courseId : course.id,
         courseName: form.courseName,
         starttime: new Date(form.starttime).toISOString(),
         endtime: new Date(form.endtime).toISOString(),

@@ -1,7 +1,7 @@
 // have to create another middleware for all these endpoint only admin can do these operations -- those endpoints are registerCourse,
 
-import { Prisma } from "@prisma/client";
-import { searchSimilarCourses,searchSimilarCourseId,createCoursehelper,registerCourseId,registeredUsers,getAvailableCourses } from "../service/userService.js";
+
+import { searchSimilarCourses,updateCourse,coursesCreatedHelper,searchSimilarCourseId,createCoursehelper,registerCourseId,registeredUsers,getAvailableCourses, getRegisteredCoursesHelper } from "../service/userService.js";
 
 export const createCourse =async (req,res)=>{
     
@@ -14,6 +14,7 @@ export const createCourse =async (req,res)=>{
     
     const {courseId,courseName,starttime,endtime,mode} = req.body;
     const role=  req.user.role
+    const id =req.user.id
 
     if(role!="ADMIN")
     {
@@ -45,7 +46,7 @@ export const createCourse =async (req,res)=>{
         })
     }
 
-    if(await searchSimilarCourseId(courseId)){
+    if(await searchSimilarCourseId(courseId,endtime)){
         return res.status(400).json({
             success : false,
             message : "Course ID already exists"
@@ -53,7 +54,7 @@ export const createCourse =async (req,res)=>{
     }
 
 
-    const course = await createCoursehelper(courseId,courseName,starttime,endtime,mode);
+    const course = await createCoursehelper(courseId,courseName,starttime,endtime,mode,id);
     if(course){
         return res.status(200).json({
             success :true,
@@ -194,9 +195,72 @@ export const getAllCourses = async (req,res)=>{
 
 }
 
+export const getAllCreatedCourses =async (req,res)=>{
+   
+     // check if he is admin
+     // fetch all courses created createdBy = id
+
+    const {id,role} =req.user
+
+    if(role!='ADMIN'){
+        return res.status(401).json({
+            success :false,
+            message : "Unauthorized Method Not Allowed"
+        })
+    }
+
+    const c= await coursesCreatedHelper(id);
+    console.log("from controller",c)
+    return res.status(200).json({
+        success :true,
+        data : c
+    })
+}
+
 export const getRegisteredCourses = async (req,res)=>{
+
+    const id =req.user.id;
      
     // from enrollment table retrieve all the courses where particular userId is enrolled and also starttime> date.now()
+    let courses=[]
+
+    courses =await getRegisteredCoursesHelper(id) 
+     console.log("q")
+    console.log(courses)
+    return res.status(200).json({
+        success :true,
+        data : courses
+    })
+}
+
+export const editCourse = async (req,res)=>{
+
+    const {courseId,courseName,endtime,mode,starttime} = req.body;
+
+    const update =await updateCourse(courseId,courseName,endtime,mode,starttime);
+
+    console.log(update)
+
+    if(update){
+        return res.status(200).json({
+            success: true,
+            message : "Successfully Course Updated"
+        })
+    }
+
+    return res.status(500).json({
+        success :false,
+        message : "Failed to upadate"
+    })
+}
+
+export const deleteCourse =async(req,res)=>{
+     
+    // delete the course which means make isdeleted false and 
+    // delte the users in that course 
+    // both the thing should happen or shoud not happen so have to use transaction
+
+    
 }
 
 

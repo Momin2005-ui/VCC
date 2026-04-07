@@ -22,12 +22,13 @@ model User {
 
 model Courses {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  courseId    String        @unique
+  courseId    String        
   courseName  String
   starttime        DateTime
   endtime          DateTime
   mode        String
   createdBy  String
+  isDeleted  Boolean
   // relation
   enrollments Enrollment[]
 }

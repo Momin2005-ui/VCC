@@ -39,7 +39,8 @@ export default function AdminDashboard() {
 
   const fetchCourses = useCallback(async () => {
     try {
-      const res = await http.get("/user/getAllCourses");
+      const res = await http.get("/user/getAllCreatedCourses");
+      // console.log("dataaaaa",res.data.data)
       setCourses(res.data.data || []);
     } catch (err) {
       addToast(

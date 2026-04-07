@@ -38,9 +38,9 @@ export default function UserDashboard() {
     try {
       const [availRes, myRes] = await Promise.allSettled([
         http.get("/user/getAllCourses"),
-        // http.get("/user/getRegisteredCourses"),
+        http.get("/user/getRegisteredCourses"),
       ]);
-       console.log(availRes)
+       console.log("myRes",myRes)
       if (availRes.status === "fulfilled") {
        
         setAvailableCourses(availRes.value.data.data || []);

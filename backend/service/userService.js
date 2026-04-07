@@ -6,30 +6,52 @@ const prisma = new PrismaClient();
 
 
 export const searchSimilarCourses = async (starttime, endtime, mode) => {
-    const newStart = new Date(starttime);
-    const newEnd = new Date(endtime);
-    const res = await prisma.courses.findFirst({
-        where: {
-            mode: mode,
-            AND: [
-                {
-                    starttime: {
-                        lt: newEnd   // existing.start < new.end
-                    }
-                },
-                {
-                    endtime: {
-                        gt: newStart // existing.end > new.start
-                    }
-                }
-            ]
-        }
-    });
 
-    return res !== null;
+    // cant crete course on same day and overlapping applied
+  const newStart = new Date(starttime);
+  const newEnd = new Date(endtime);
+
+  
+  const startOfDay = new Date(newStart);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(newStart);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const res = await prisma.courses.findFirst({
+    where: {
+      mode: mode,
+
+      AND: [
+        
+        {
+          starttime: {
+            gte: startOfDay,
+            lte: endOfDay
+          }
+        },
+
+       
+        {
+          starttime: {
+            lt: newEnd
+          }
+        },
+        {
+          endtime: {
+            gt: newStart
+          }
+        },{
+            isDeleted : false
+        }
+      ]
+    }
+  });
+
+  return res !== null;
 };
 
-export const createCoursehelper = async (courseId,courseName,starttime,endtime,mode)=>{
+export const createCoursehelper = async (courseId,courseName,starttime,endtime,mode,id)=>{
     const newStart = new Date(starttime);
     const newEnd = new Date(endtime);
     return await prisma.courses.create({
@@ -38,17 +60,24 @@ export const createCoursehelper = async (courseId,courseName,starttime,endtime,m
             courseName : courseName,
             starttime : newStart,
             endtime : newEnd,
-            mode : mode
+            mode : mode,
+            isDeleted :false,
+            createdBy: id
         }
     })
 }
 
 
 
-export const searchSimilarCourseId =async (courseId)=>{
+export const searchSimilarCourseId =async (courseId,endtime)=>{
+    
     const res=await prisma.courses.findFirst({
         where :{
-            courseId : courseId
+            courseId : courseId,
+            starttime :{
+                lte :endtime
+            },
+            isDeleted:false
         }
     })
     if(res!=null)
@@ -106,4 +135,65 @@ export const getAvailableCourses = async (id)=>{
     // return courses - registeredCourses
 
 
+}
+
+export const getRegisteredCoursesHelper =async(id)=>{
+    let registeredCoursesId=[]
+
+    registeredCoursesId = await prisma.enrollment.findMany({
+        where : {
+            userId : id
+        },
+        select :{
+            courseId :true
+        } 
+    })
+   
+
+        const registeredCourses = registeredCoursesId.map(u => u.courseId);
+        let time =new Date(Date.now())
+        const courseDetails = await prisma.courses.findMany({
+        where: {
+            id: {
+            in: registeredCourses
+            },
+            endtime :{
+                gte : time
+            }
+        }
+        });
+
+        return courseDetails
+}
+
+export const coursesCreatedHelper = async(id) =>{
+    const time =new Date(Date.now())
+    const courses= await prisma.courses.findMany({
+        where : {
+            createdBy : id,
+            isDeleted :false,
+            endtime :{
+                gte :time
+            }
+        },
+        omit :{
+            createdBy:true
+        }
+    })
+    console.log(courses)
+    return courses
+}
+
+export const updateCourse = async (courseId,courseName,endtime,mode,starttime)=>{
+    return await prisma.courses.update({
+        where :{
+            id : courseId
+        },
+        data :{
+            courseName :courseName,
+            starttime :starttime,
+            endtime :endtime,
+            mode : mode
+        }
+    })
 }
