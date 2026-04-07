@@ -1,7 +1,7 @@
 // have to create another middleware for all these endpoint only admin can do these operations -- those endpoints are registerCourse,
 
 
-import { searchSimilarCourses,updateCourse,coursesCreatedHelper,searchSimilarCourseId,createCoursehelper,registerCourseId,registeredUsers,getAvailableCourses, getRegisteredCoursesHelper } from "../service/userService.js";
+import { searchSimilarCourses,unEnrollStud,updateCourse,coursesCreatedHelper,searchSimilarCourseId,createCoursehelper,registerCourseId,registeredUsers,getAvailableCourses, getRegisteredCoursesHelper, deleteCoursehelper } from "../service/userService.js";
 
 export const createCourse =async (req,res)=>{
     
@@ -9,10 +9,13 @@ export const createCourse =async (req,res)=>{
     // check if the courseName and time , Mode  is provided or not
     // if provided check the provided time with the other courses with same details  ... loop the course table
     // create the course in the course table
-    
+    const nowTime = new Date(); // already UTC internally
+
+
     
     
     const {courseId,courseName,starttime,endtime,mode} = req.body;
+         const start = new Date(starttime);
     const role=  req.user.role
     const id =req.user.id
 
@@ -28,6 +31,13 @@ export const createCourse =async (req,res)=>{
         return res.status(400).json({
             message: "please provide all the details",
             success : false
+        })
+    }
+    console.log(nowTime>start)
+    if(nowTime>= new Date(starttime)){
+        return res.status(400).json({
+            success :false,
+            message : "Invalid start time"
         })
     }
 
@@ -255,12 +265,50 @@ export const editCourse = async (req,res)=>{
 }
 
 export const deleteCourse =async(req,res)=>{
+
+    const courseId =req.body.courseId;
+    const role = req.user.role
+
+    if(role!='ADMIN'){
+        return res.status(401).json({
+            success :false,
+            message : "You think you are Smart!!"
+        })
+    }
      
-    // delete the course which means make isdeleted false and 
+    // delete the course which means make isdeleted true and 
     // delte the users in that course 
     // both the thing should happen or shoud not happen so have to use transaction
+    // get the users related to the course
+    // make the isdeleted coloumn true
+    // loop through (users,courseId) and delete the enrollments ====> this i not needed courseId cannot be same in near future
+    const resp =await deleteCoursehelper(courseId)
+    console.log("I hpe it is deleted",resp);
+    return res.status(200).json({
+        success :true,
+        message : "Course removed Successfully"
+    })
+}
 
-    
+export const unEnroll = async (req,res)=>{
+
+    const courseId = req.body.courseId;
+    const id =req.user.id;
+    console.log(id,courseId)
+    const response =await unEnrollStud(courseId,id);
+    console.log("response",response)
+    if(response){
+        return res.status(200).json({
+            success :true,
+            message : "Successfully unenrolled from course"
+        })
+    }
+    else{
+        return res.status(500).json({
+            success :false,
+            message : "Something happened try again"
+        })
+    }
 }
 
 

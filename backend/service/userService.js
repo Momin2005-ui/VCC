@@ -197,3 +197,32 @@ export const updateCourse = async (courseId,courseName,endtime,mode,starttime)=>
         }
     })
 }
+
+export const unEnrollStud = async (courseId,id) =>{
+    return await prisma.enrollment.delete({
+  where: {
+    userId_courseId: {
+      userId: id,
+      courseId: courseId
+    }
+  }
+})};
+
+export const deleteCoursehelper = async (courseId)=>{
+  return await prisma.$transaction([
+  prisma.courses.update({
+    where: {
+      id: courseId
+    },
+    data: {
+      isDeleted: true
+    }
+  }),
+
+  prisma.enrollment.deleteMany({
+    where: {
+      courseId: courseId
+    }
+  })
+]);
+}

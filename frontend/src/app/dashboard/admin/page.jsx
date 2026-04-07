@@ -88,7 +88,11 @@ export default function AdminDashboard() {
   const handleDeleteCourse = async (courseId) => {
     if (!confirm("Are you sure you want to delete this course?")) return;
     try {
-      await http.delete(`/user/deleteCourse/${courseId}`);
+      await http.delete("/user/deleteCourse", {
+  data: {
+    courseId: courseId
+  }
+});
       addToast("Course deleted successfully", "success");
       fetchCourses();
     } catch (err) {

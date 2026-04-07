@@ -1,5 +1,5 @@
 import express from "express";
-import { createCourse, getRegisteredUsers,registerCourse,getAllCourses,getRegisteredCourses ,getAllCreatedCourses, editCourse} from "../controller/userController.js";
+import { createCourse,deleteCourse, getRegisteredUsers,registerCourse,getAllCourses,getRegisteredCourses ,getAllCreatedCourses, editCourse, unEnroll} from "../controller/userController.js";
 const router = express.Router();
 
 router.post("/createCourse",createCourse);
@@ -9,6 +9,8 @@ router.get("/getAllCourses",getAllCourses);
 router.get("/getRegisteredCourses",getRegisteredCourses);
 router.get("/getAllCreatedCourses",getAllCreatedCourses);
 router.put("/updateCourse",editCourse);
+router.post("/unenrollCourse",unEnroll);
+router.delete("/deleteCourse",deleteCourse);
 
 
 export default router;
