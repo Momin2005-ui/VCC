@@ -175,6 +175,7 @@ export const setAccessTokenCookie = (res, accessToken) => {
     httpOnly: true,
     secure: true,
     sameSite: "None",
+    partitioned: true,
     maxAge: 15 * 60 * 1000
 });
 }
@@ -184,6 +185,7 @@ export const setRefreshTokenCookie = (res, refreshToken) => {
     httpOnly: true,
     secure: true,
     sameSite: "None", 
+    partitioned: true,
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
 }

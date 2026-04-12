@@ -217,7 +217,7 @@ export const verifyGoogleToken =async (req,res)=>{
 }
 
 export const refresh = async (req, res) => {
-    const cookieOptions = { httpOnly: true, sameSite: "None", path: "/", secure: true };
+    const cookieOptions = { httpOnly: true, sameSite: "None", path: "/", secure: true, partitioned: true };
 
      // when refresh comes check if refresh token exist in cookies if not return unauthorized
     // if exist verify it decode it get the email 
@@ -341,12 +341,14 @@ export const logout = async (req, res) => {
     res.clearCookie("accessToken", {
         httpOnly: true,
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        partitioned: true
     });
     res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        partitioned: true
     });
 
     const refreshToken = req.cookies?.refreshToken;
