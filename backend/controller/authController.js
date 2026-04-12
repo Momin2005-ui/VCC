@@ -217,7 +217,7 @@ export const verifyGoogleToken =async (req,res)=>{
 }
 
 export const refresh = async (req, res) => {
-    const cookieOptions = { httpOnly: true, sameSite: "lax", path: "/", secure: false };
+    const cookieOptions = { httpOnly: true, sameSite: "None", path: "/", secure: true };
 
      // when refresh comes check if refresh token exist in cookies if not return unauthorized
     // if exist verify it decode it get the email 
@@ -333,3 +333,39 @@ export const whoAmI = async(req,res)=>{
 
 
 }
+
+
+
+export const logout = async (req, res) => {
+    // Clear cookies with the same options they were set
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    });
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    });
+
+    const refreshToken = req.cookies?.refreshToken;
+    if (refreshToken) {
+        try {
+            const decoded = jwt.verify(refreshToken, process.env.JWTSECRETKEY);
+            if (decoded && decoded.userId) {
+                await prisma.user.update({
+                    where: { id: decoded.userId },
+                    data: { refreshToken: null }
+                });
+            }
+        } catch (error) {
+            // Ignore error if token is expired or invalid
+        }
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Successfully logged out"
+    });
+};

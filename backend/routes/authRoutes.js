@@ -1,6 +1,6 @@
 import express from 'express'
 
-import {login,refresh,register, sendMail, verifyEmailToken,verifyGoogleToken,whoAmI} from "../controller/authController.js"
+import {login,logout,refresh,register, sendMail, verifyEmailToken,verifyGoogleToken,whoAmI} from "../controller/authController.js"
 
 const router =express.Router();
 
@@ -11,5 +11,6 @@ router.post("/verify",verifyEmailToken)
 router.get("/me",whoAmI)
 router.post("/refresh",refresh)
 router.post("/google",verifyGoogleToken)
+router.post("/logout",logout)
 
 export default router;

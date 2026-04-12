@@ -9,7 +9,7 @@ import { authMiddleware } from "./Middleware/authMiddleware.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FRONTEND_URL = process.env.FRONTENDURL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTENDURL || "https://group28finalproject.vercel.app";
 
 app.use(
   cors({
