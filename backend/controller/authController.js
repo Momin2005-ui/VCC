@@ -73,7 +73,7 @@ export const login=async (req,res)=>{
     // 8. send accessToken as cookie 
     // 9. in future store refresh in redis if redis fails get it from db
     const {email,password} =req.body
-
+   
     if(!email || !password )
     {
         return res.status(400).json({

@@ -77,7 +77,7 @@
 
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API = process.env.NEXT_PUBLIC_API_URL || " https://vcc-wzkd.onrender.com";
 
 const http = axios.create({
   baseURL: API,
