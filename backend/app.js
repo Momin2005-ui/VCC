@@ -9,11 +9,11 @@ import { authMiddleware } from "./Middleware/authMiddleware.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FRONTEND_URL = process.env.FRONTENDURL || "https://group28finalproject.vercel.app";
+const FRONTEND_URL = process.env.FRONTENDURL || "https://group28finalproject.vercel.app" ;
 
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: [FRONTEND_URL,"https://project-0pxev-git-main-noname12345s-projects.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
